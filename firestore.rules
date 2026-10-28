@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'leopoldox5284@gmail.com' ||
+        (exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.get('role', 'user') == 'admin')
+      );
+    }
+
+    // Profile validation
+    function isValidProfile(data, userId) {
+      return data.keys().hasAll(['id', 'alias', 'color_texto']) &&
+        data.id == request.auth.uid &&
+        data.id == userId &&
+        data.alias is string &&
+        data.alias.size() >= 3 &&
+        data.alias.size() <= 50 &&
+        data.color_texto is string &&
+        data.color_texto.size() <= 20;
+    }
+
+    // Message validation
+    function isValidMessage(data) {
+      return data.keys().hasAll(['room_id', 'user_id', 'alias', 'contenido']) &&
+        data.user_id == request.auth.uid &&
+        data.room_id is string &&
+        data.room_id.size() <= 64 &&
+        data.alias is string &&
+        data.alias.size() >= 2 &&
+        data.alias.size() <= 50 &&
+        data.contenido is string &&
+        data.contenido.size() >= 1 &&
+        data.contenido.size() <= 500;
+    }
+
+    // Private Message validation
+    function isValidPrivateMessage(data) {
+      return data.keys().hasAll(['from_user', 'to_user', 'contenido']) &&
+        data.from_user == request.auth.uid &&
+        data.to_user is string &&
+        data.to_user.size() <= 128 &&
+        data.contenido is string &&
+        data.contenido.size() >= 1 &&
+        data.contenido.size() <= 500;
+    }
+
+    // Profiles Collection
+    match /profiles/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId) && isValidId(userId) && isValidProfile(incoming(), userId);
+      allow update: if (isOwner(userId) && isValidId(userId)) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Messages Collection (Salas Públicas)
+    match /messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(messageId) && isValidMessage(incoming());
+      // Permitir actualización solo para agregar o remover reacciones
+      allow update: if isSignedIn() && isValidId(messageId) &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['reactions']);
+      allow delete: if isAdmin();
+    }
+
+    // Private Messages Collection
+    match /private_messages/{msgId} {
+      allow read: if isSignedIn() && (resource.data.from_user == request.auth.uid || resource.data.to_user == request.auth.uid);
+      allow create: if isSignedIn() && isValidId(msgId) && isValidPrivateMessage(incoming());
+      allow update, delete: if false;
+    }
+
+    // Reports Collection
+    match /reports/{reportId} {
+      allow create: if isSignedIn() && isValidId(reportId) && incoming().reporter_id == request.auth.uid;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Blocks Collection
+    match /blocks/{blockId} {
+      allow read: if isSignedIn() && resource.data.user_id == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(blockId) && incoming().user_id == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.user_id == request.auth.uid;
+    }
+
+    // Banned Words Collection
+    match /banned_words/{wordId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Rooms Metadata Collection
+    match /rooms/{roomId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Room Presence Subcollection
+    match /rooms/{roomId}/presence/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && isValidId(roomId) && isValidId(userId) &&
+        incoming().user_id == request.auth.uid;
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+  }
+}

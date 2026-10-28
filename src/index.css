@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .bevel-raised {
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+  }
+
+  .bevel-sunken {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+  }
+
+  .bevel-deep-sunken {
+    border-top: 2px solid #202020;
+    border-left: 2px solid #202020;
+    border-right: 2px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .bevel-button {
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #404040;
+    border-bottom: 2px solid #404040;
+    background-color: #d4d0c8;
+    box-shadow: inset 1px 1px 0px #ece9d8, inset -1px -1px 0px #808080;
+  }
+
+  .bevel-button:active {
+    border-top: 2px solid #404040;
+    border-left: 2px solid #404040;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: inset 1px 1px 0px #202020;
+    padding-top: calc(0.25rem + 1px);
+    padding-left: calc(0.5rem + 1px);
+  }
+
+  .bevel-window {
+    border-top: 2px solid #dfdfdf;
+    border-left: 2px solid #dfdfdf;
+    border-right: 2px solid #0a0a0a;
+    border-bottom: 2px solid #0a0a0a;
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.45);
+  }
+}
+
+/* Animación auténtica de ZUMBIDO / NUDGE de MSN Messenger */
+@keyframes msn-nudge {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-10px, -5px) rotate(-0.8deg); }
+  20% { transform: translate(10px, 5px) rotate(0.8deg); }
+  30% { transform: translate(-10px, 5px) rotate(-0.8deg); }
+  40% { transform: translate(10px, -5px) rotate(0.8deg); }
+  50% { transform: translate(-7px, 3px) rotate(-0.5deg); }
+  60% { transform: translate(7px, -3px) rotate(0.5deg); }
+  70% { transform: translate(-4px, 2px) rotate(0deg); }
+  80% { transform: translate(4px, -2px) rotate(0deg); }
+  90% { transform: translate(-2px, 1px) rotate(0deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.animate-msn-nudge {
+  animation: msn-nudge 0.55s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Custom retro scrollbar clásico de Yahoo / Windows */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+  background: #d4d0c8;
+}
+
+::-webkit-scrollbar-track {
+  background: #e6e4df;
+  border: 1px solid #808080;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d0c8;
+  border-top: 2px solid #ffffff;
+  border-left: 2px solid #ffffff;
+  border-right: 2px solid #404040;
+  border-bottom: 2px solid #404040;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #b5b1a8;
+  border-top: 2px solid #404040;
+  border-left: 2px solid #404040;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+}
+
+body {
+  font-family: Tahoma, Verdana, Arial, "MS Sans Serif", sans-serif;
+  user-select: text;
+}

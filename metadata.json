@@ -1,0 +1,6 @@
+{
+  "name": "Yahoo Chat 2000s - Sala General",
+  "description": "Chat público retro estilo Yahoo años 2000 con Supabase, login con enlace mágico y alias aleatorio automático.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

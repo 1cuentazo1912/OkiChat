@@ -1,0 +1,124 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "Profile",
+      "description": "User profile with role, badges, and mute status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "alias": { "type": "string", "maxLength": 50 },
+        "color_texto": { "type": "string", "maxLength": 20 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "created_at": { "type": "string", "maxLength": 50 },
+        "ultimo_cambio_alias": { "type": "string", "maxLength": 50 },
+        "silenciado_hasta": { "type": "string", "description": "ISO timestamp until which user is muted", "maxLength": 50 },
+        "baneado": { "type": "boolean" },
+        "email": { "type": "string", "maxLength": 150 }
+      },
+      "required": ["id", "alias", "color_texto"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Public chat message",
+      "type": "object",
+      "properties": {
+        "room_id": { "type": "string", "maxLength": 64 },
+        "user_id": { "type": "string", "maxLength": 128 },
+        "alias": { "type": "string", "maxLength": 50 },
+        "contenido": { "type": "string", "maxLength": 500 },
+        "color_texto": { "type": "string", "maxLength": 20 },
+        "created_at": { "type": "string", "maxLength": 50 },
+        "is_system": { "type": "boolean" },
+        "is_action": { "type": "boolean" },
+        "is_bot": { "type": "boolean" },
+        "reactions": { "type": "object" }
+      },
+      "required": ["room_id", "user_id", "alias", "contenido"]
+    },
+    "PrivateMessage": {
+      "title": "PrivateMessage",
+      "description": "Direct message between two users",
+      "type": "object",
+      "properties": {
+        "from_user": { "type": "string", "maxLength": 128 },
+        "from_alias": { "type": "string", "maxLength": 50 },
+        "to_user": { "type": "string", "maxLength": 128 },
+        "to_alias": { "type": "string", "maxLength": 50 },
+        "contenido": { "type": "string", "maxLength": 500 },
+        "color_texto": { "type": "string", "maxLength": 20 },
+        "created_at": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["from_user", "to_user", "contenido"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Abuse or violation report submitted by user",
+      "type": "object",
+      "properties": {
+        "reporter_id": { "type": "string", "maxLength": 128 },
+        "reporter_alias": { "type": "string", "maxLength": 50 },
+        "reported_user_id": { "type": "string", "maxLength": 128 },
+        "reported_alias": { "type": "string", "maxLength": 50 },
+        "message_id": { "type": "string", "maxLength": 128 },
+        "message_content": { "type": "string", "maxLength": 500 },
+        "motivo": { "type": "string", "maxLength": 100 },
+        "estado": { "type": "string", "enum": ["pendiente", "revisado"] },
+        "created_at": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["reporter_id", "reported_user_id", "motivo", "estado"]
+    },
+    "Block": {
+      "title": "Block",
+      "description": "User ignore / block relationship",
+      "type": "object",
+      "properties": {
+        "user_id": { "type": "string", "maxLength": 128 },
+        "blocked_user_id": { "type": "string", "maxLength": 128 },
+        "blocked_alias": { "type": "string", "maxLength": 50 },
+        "created_at": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["user_id", "blocked_user_id"]
+    },
+    "BannedWord": {
+      "title": "BannedWord",
+      "description": "Prohibited word or pattern",
+      "type": "object",
+      "properties": {
+        "word": { "type": "string", "maxLength": 100 },
+        "added_by": { "type": "string", "maxLength": 128 },
+        "created_at": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["word"]
+    }
+  },
+  "firestore": {
+    "/profiles/{userId}": {
+      "schema": "Profile",
+      "description": "Profiles with role and sanctions"
+    },
+    "/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Room messages with reactions"
+    },
+    "/private_messages/{msgId}": {
+      "schema": "PrivateMessage",
+      "description": "Private direct messages"
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "User reports for admin panel"
+    },
+    "/blocks/{blockId}": {
+      "schema": "Block",
+      "description": "User block lists"
+    },
+    "/banned_words/{wordId}": {
+      "schema": "BannedWord",
+      "description": "Admin configurable banned words"
+    },
+    "/rooms/{roomId}/presence/{userId}": {
+      "schema": "Presence",
+      "description": "Active users in room"
+    }
+  }
+}
